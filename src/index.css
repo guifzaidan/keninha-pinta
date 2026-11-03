@@ -1,0 +1,202 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-cream: #fbf6f0;
+  --color-paper: #ffffff;
+  --color-blush: #fbeef3;
+  --color-mist: #f3eefc;
+  --color-ink: #2b1838;
+  --color-ink-soft: #66566f;
+  --color-line: #e9e0e6;
+  --color-lilac: #9b6ef0;
+  --color-lilac-deep: #7542d6;
+  --color-pink: #e9488f;
+  --color-pink-deep: #c93478;
+  --color-gold: #f6b83c;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+
+  --animate-flap: flap 1.6s ease-in-out infinite;
+
+  @keyframes flap {
+    0%,
+    100% {
+      transform: scaleX(1);
+    }
+    50% {
+      transform: scaleX(0.4);
+    }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+  html,
+  body {
+    /* clip (not hidden) keeps position: sticky working */
+    overflow-x: clip;
+  }
+  body {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: var(--color-pink);
+    color: white;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-lilac);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /*
+   * The ONLY emphasized button on the page. It always means "go get the course",
+   * so visitors never have to guess where to click.
+   */
+  .btn-buy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    border: 2px solid var(--color-ink);
+    border-radius: 999px;
+    background: var(--color-pink);
+    color: white;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    box-shadow: 4px 4px 0 0 var(--color-ink);
+    transition:
+      transform 0.18s ease,
+      translate 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+      box-shadow 0.18s ease,
+      background-color 0.2s ease;
+  }
+  .btn-buy:hover {
+    background: var(--color-pink-deep);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--color-ink);
+  }
+  .btn-buy:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 0 var(--color-ink);
+  }
+
+  /* Quiet secondary action: text link with arrow */
+  .link-soft {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--color-line);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+    transition: text-decoration-color 0.2s ease;
+  }
+  .link-soft:hover {
+    text-decoration-color: var(--color-pink);
+  }
+
+  /* Sunburst rays (colors via --sun-a / --sun-b) */
+  .sunburst {
+    background: repeating-conic-gradient(
+      from 0deg,
+      var(--sun-a, #f7d9e6) 0deg 9deg,
+      var(--sun-b, #fbf6f0) 9deg 18deg
+    );
+    will-change: transform;
+  }
+
+  /* Headline word whose gradient follows the mouse (--mx set by <Sunburst>) */
+  .text-shift {
+    background-image: linear-gradient(90deg, var(--color-pink), var(--color-lilac), var(--color-pink), var(--color-lilac));
+    background-size: 300% 100%;
+    background-position: calc(var(--mx, 0.3) * 100%) 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: background-position 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  /* 3D tilt + glare (driven by <Tilt>) */
+  .tilt {
+    position: relative;
+    transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+    will-change: transform;
+  }
+  .tilt.is-tilting {
+    transition: transform 0.1s linear;
+  }
+  .tilt-glare {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgb(255 255 255 / 0.38), transparent 55%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .tilt.is-tilting .tilt-glare {
+    opacity: 1;
+  }
+
+  .card {
+    background: var(--color-paper);
+    border: 1px solid var(--color-line);
+    border-radius: 1.5rem;
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-pink-deep);
+  }
+
+  /* Scroll reveal: animation (fill: backwards) so it never fights hover transforms */
+  .reveal {
+    opacity: 0;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    animation: reveal-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) var(--delay, 0ms) backwards;
+  }
+  @keyframes reveal-in {
+    from {
+      opacity: 0;
+      translate: 0 16px;
+    }
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1;
+  }
+}
