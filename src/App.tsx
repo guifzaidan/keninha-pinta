@@ -1,4 +1,5 @@
 import { About } from './components/About'
+import { CheckoutModal } from './components/CheckoutModal'
 import { FloatingActions } from './components/Extras'
 import { Faq } from './components/Faq'
 import { Footer } from './components/Footer'
@@ -31,6 +32,7 @@ export default function App() {
       </main>
       <Footer />
       <FloatingActions />
+      <CheckoutModal />
     </>
   )
 }

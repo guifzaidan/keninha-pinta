@@ -1,16 +1,21 @@
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import { GALLERY } from '../content'
+import type { GalleryItem } from '../content'
 import { prefersReducedMotion } from '../hooks'
+import { useContent } from '../content-store'
 import { Tilt } from './interactive'
 import { SectionTitle } from './ui'
 
 const AUTO_SPEED = 45 // px per second
 const COPIES = 3 // [clone][real][clone] so we can wrap seamlessly in both directions
-const LOOP = Array.from({ length: COPIES }, (_, c) => GALLERY.map((p, i) => ({ ...p, i, clone: c !== 1 }))).flat()
-
 export function Gallery() {
+  const { gallery } = useContent()
+  const items = gallery.items
+  const loop = useMemo(
+    () => Array.from({ length: COPIES }, (_, c) => items.map((p, i) => ({ ...p, i, clone: c !== 1 }))).flat(),
+    [items],
+  )
   const viewport = useRef<HTMLDivElement>(null)
   const track = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState<number | null>(null)
@@ -38,7 +43,7 @@ export function Gallery() {
 
     const measure = () => {
       const first = tr.children[0] as HTMLElement | undefined
-      const second = tr.children[GALLERY.length] as HTMLElement | undefined
+      const second = tr.children[items.length] as HTMLElement | undefined
       if (!first || !second) return
       const old = s.setW
       s.setW = second.offsetLeft - first.offsetLeft
@@ -88,7 +93,7 @@ export function Gallery() {
       ro.disconnect()
       io.disconnect()
     }
-  }, [])
+  }, [items.length])
 
   useEffect(() => {
     m.current.paused = open !== null
@@ -140,8 +145,8 @@ export function Gallery() {
   return (
     <section id="galeria" className="overflow-hidden bg-paper py-24 sm:py-28">
       <div className="px-4 sm:px-6">
-        <SectionTitle eyebrow="Galeria" sub="Algumas das pinturas que você vai aprender a fazer no curso.">
-          Do primeiro traço a pinturas como estas
+        <SectionTitle eyebrow={gallery.eyebrow} sub={gallery.sub}>
+          {gallery.title}
         </SectionTitle>
       </div>
 
@@ -156,7 +161,7 @@ export function Gallery() {
         aria-label="Pinturas da Keninha"
       >
         <div ref={track} className="flex gap-5 py-3 will-change-transform">
-          {LOOP.map((p, k) => (
+          {loop.map((p, k) => (
             <button
               key={k}
               type="button"
@@ -189,7 +194,7 @@ export function Gallery() {
         </div>
       </div>
 
-      {open !== null && <Lightbox index={open} onClose={() => setOpen(null)} onChange={setOpen} />}
+      {open !== null && items[open] && <Lightbox items={items} index={open} onClose={() => setOpen(null)} onChange={setOpen} />}
     </section>
   )
 }
@@ -206,9 +211,9 @@ function PaintSticker({ title, color, dark, tilt = 0, className = '' }: { title:
   )
 }
 
-function Lightbox({ index, onClose, onChange }: { index: number; onClose: () => void; onChange: (i: number) => void }) {
+function Lightbox({ items, index, onClose, onChange }: { items: GalleryItem[]; index: number; onClose: () => void; onChange: (i: number) => void }) {
   const dialog = useRef<HTMLDialogElement>(null)
-  const total = GALLERY.length
+  const total = items.length
   const go = useCallback((d: number) => onChange((index + d + total) % total), [index, onChange, total])
 
   useEffect(() => {
@@ -222,7 +227,7 @@ function Lightbox({ index, onClose, onChange }: { index: number; onClose: () => 
     return () => window.removeEventListener('keydown', onKey)
   }, [go])
 
-  const p = GALLERY[index]
+  const p = items[index]
   const btn = 'absolute grid h-11 w-11 place-items-center rounded-full bg-paper shadow-lg transition-transform hover:scale-105'
   return (
     <dialog

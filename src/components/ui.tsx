@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { CHECKOUT_URL } from '../content'
 import { useMagnetic } from '../hooks'
+import { useContent } from '../content-store'
 
 const WING_UPPER = 'M58 46C44 14 10 4 8 26c-2 18 22 26 50 24z'
 const WING_LOWER = 'M58 53C36 54 18 70 26 86c8 12 28-6 32-30z'
@@ -53,11 +53,12 @@ export function WhatsAppIcon({ className }: { className?: string }) {
 }
 
 /** The single call-to-action used everywhere. Same label, same color, same destination. */
-export function BuyButton({ className = '', children = 'Quero fazer o curso' }: { className?: string; children?: ReactNode }) {
+export function BuyButton({ className = '', children }: { className?: string; children?: ReactNode }) {
+  const { links } = useContent()
   const ref = useMagnetic<HTMLAnchorElement>(0.22)
   return (
-    <a ref={ref} href={CHECKOUT_URL} className={`btn-buy group ${className}`}>
-      {children}
+    <a ref={ref} href={links.checkoutUrl} className={`btn-buy group ${className}`}>
+      {children ?? links.buyButton}
       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
     </a>
   )

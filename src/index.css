@@ -46,6 +46,10 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
+  /* No page scroll behind the checkout modal */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
   ::selection {
     background: var(--color-pink);
     color: white;

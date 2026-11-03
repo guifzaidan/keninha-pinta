@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { CHECKOUT_URL, COURSE, WHATSAPP_URL } from '../content'
+import { whatsappUrl } from '../content'
+import { useContent } from '../content-store'
 import { WhatsAppIcon } from './ui'
 
 /** True after the hero, except while the offer box is on screen. */
@@ -28,11 +29,12 @@ function useStickyCtaVisible() {
 /** Mobile bottom bar + WhatsApp bubble (which lifts above the bar on mobile while it's showing). */
 export function FloatingActions() {
   const show = useStickyCtaVisible()
+  const { course, links } = useContent()
 
   return (
     <>
       <a
-        href={WHATSAPP_URL}
+        href={whatsappUrl(links.whatsapp, links.whatsappMessage)}
         target="_blank"
         rel="noreferrer noopener"
         aria-label="Fale com a gente no WhatsApp"
@@ -51,11 +53,11 @@ export function FloatingActions() {
       >
         <div className="flex items-center justify-between gap-3">
           <div className="leading-tight">
-            <p className="text-xs text-ink-soft">{COURSE.name}</p>
-            <p className="text-lg font-bold">R$ {COURSE.price}</p>
+            <p className="text-xs text-ink-soft">{course.name}</p>
+            <p className="text-lg font-bold">R$ {course.price}</p>
           </div>
-          <a href={CHECKOUT_URL} className="btn-buy px-5 py-3 text-sm whitespace-nowrap">
-            Quero fazer o curso
+          <a href={links.checkoutUrl} className="btn-buy px-5 py-3 text-sm whitespace-nowrap">
+            {links.buyButton}
           </a>
         </div>
       </div>

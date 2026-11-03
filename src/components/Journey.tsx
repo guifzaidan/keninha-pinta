@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
 import type { CSSProperties } from 'react'
-import { JOURNEY } from '../content'
+import { useContent } from '../content-store'
 import { SectionTitle } from './ui'
 
 export function Journey() {
+  const { journey } = useContent()
   const list = useRef<HTMLDivElement>(null)
   const fill = useRef<HTMLDivElement>(null)
 
@@ -38,8 +39,8 @@ export function Journey() {
 
   return (
     <section id="o-curso" className="px-4 py-24 sm:px-6 sm:py-28">
-      <SectionTitle eyebrow="O curso" sub="Cada etapa se apoia na anterior, para você nunca se sentir perdida.">
-        O caminho, passo a passo
+      <SectionTitle eyebrow={journey.eyebrow} sub={journey.sub}>
+        {journey.title}
       </SectionTitle>
 
       <div ref={list} className="relative mx-auto mt-16 max-w-2xl">
@@ -48,9 +49,9 @@ export function Journey() {
         </div>
 
         <ol className="space-y-10">
-          {JOURNEY.map((s, i) => (
+          {journey.items.map((s, i) => (
             <li
-              key={s.title}
+              key={i}
               className="reveal group relative grid grid-cols-[2.5rem_1fr] gap-5 sm:gap-7"
               style={{ '--delay': '40ms' } as CSSProperties}
             >
